@@ -1,0 +1,5 @@
+# Ignoring dotnet output folders
+Speedtest.Logger.Tests/bin/
+Speedtest.Logger.Tests/obj/
+Speedtest.Logger/bin/
+Speedtest.Logger/obj/
