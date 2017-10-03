@@ -1,8 +1,7 @@
-﻿// Learn more about F# at http://fsharp.org
+﻿module Speedtest.Logger.Tests
 
-open System
+open Expecto
 
 [<EntryPoint>]
 let main argv =
-    printfn "Hello World from F#!"
-    0 // return an integer exit code
+    Tests.runTestsInAssembly defaultConfig argv

@@ -6,12 +6,17 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="Program.fs" />
+    <Compile Include="*.fs" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="FSharp.Core" Version="4.1.*" />
     <PackageReference Include="FSharp.NET.Sdk" Version="1.0.*" PrivateAssets="All" />
+    <PackageReference Include="Expecto" Version="5.*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!--<ProjectReference Include="../Speedtest.Logger/Speedtest.Logger.fsproj" />-->
   </ItemGroup>
 
 </Project>
