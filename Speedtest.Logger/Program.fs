@@ -2,10 +2,11 @@
 open System.Text
 open System.Net.Http
 open Speedtest.Logger
+open Newtonsoft.Json
 
 let client = new HttpClient()
 
-let rec download (urls:string list) = async {
+let rec download (urls : string list) = async {
     match urls with
     | head :: tail ->
         let! response =
@@ -29,6 +30,21 @@ let sites = [
     "https://computas.com/globalassets/ansattbilder/johanne-lovsland.png";
 ]
 
+type Speedtest = {
+    Id: Guid
+    Download: double
+    Timestamp: int
+}
+
+type HttpClient with
+    member this.PostAsJsonAsync (speed : Speedtest) =
+        let json = JsonConvert.SerializeObject(speed);
+        let content = new StringContent (json)
+        content.Headers.ContentType <- Headers.MediaTypeHeaderValue "application/json"
+        this.PostAsync ("http://localhost:5000/speedtests", content)
+
+[<Measure>] type ms
+
 [<EntryPoint>]
 let main argv =
     let timer = Diagnostics.Stopwatch()
@@ -38,8 +54,17 @@ let main argv =
     
     let t = timer.ElapsedMilliseconds 
     
-    // System.Threading.Thread.Sleep(20)
     let speed = (double noOfByte / double t) * 0.008
+
+    let s = {
+        Id = Guid.NewGuid()
+        Download = speed
+        Timestamp = 1234
+    }
+
+    let hc = new HttpClient()
+    hc.PostAsJsonAsync s |> ignore
+
     printfn "Download speed %f Mbps" speed
 
     0
