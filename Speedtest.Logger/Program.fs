@@ -4,18 +4,16 @@ open System.Net.Http
 open Speedtest.Logger
 open Newtonsoft.Json
 
-let client = new HttpClient()
+let downloadUrl (client : HttpClient) (url : string) : int =
+    client.GetByteArrayAsync(url)
+    |> Async.AwaitTask
+    |> Async.RunSynchronously
+    |> (fun r -> r.Length)
 
-let rec download (urls : string list) = async {
-    match urls with
-    | head :: tail ->
-        let! response =
-            client.GetByteArrayAsync(head)
-            |> Async.AwaitTask
-
-        return response.Length + (download tail |> Async.RunSynchronously)
-    | [] -> return 0
-}
+let downloadUrls (http : HttpClient) (urls : string list) = 
+    urls
+    |> List.map (downloadUrl http)
+    |> List.fold (+) 0
 
 let sites = [
     "https://computas.com/globalassets/ansattbilder/atle-gram-ag.jpg";
@@ -36,21 +34,26 @@ type Speedtest = {
     Timestamp: int
 }
 
-type HttpClient with
-    member this.PostAsJsonAsync (speed : Speedtest) =
-        let json = JsonConvert.SerializeObject(speed);
-        let content = new StringContent (json)
-        content.Headers.ContentType <- Headers.MediaTypeHeaderValue "application/json"
-        this.PostAsync ("http://localhost:5000/speedtests", content)
+let postAsync (client : HttpClient) (speed : Speedtest)=
+    let json = JsonConvert.SerializeObject(speed);
+    let content = new StringContent (json)
+    content.Headers.ContentType <- Headers.MediaTypeHeaderValue "application/json"
+    client.PostAsync ("http://localhost:5000/speedtests", content)
 
+
+// TODO, dette var gøy
 [<Measure>] type ms
 
 [<EntryPoint>]
 let main argv =
+    let hc = new HttpClient()
+    
     let timer = Diagnostics.Stopwatch()
     timer.Start()
 
-    let noOfByte = sites |> download |> Async.RunSynchronously
+    let noOfByte =
+        sites
+        |> downloadUrls hc
     
     let t = timer.ElapsedMilliseconds 
     
@@ -62,8 +65,7 @@ let main argv =
         Timestamp = 1234
     }
 
-    let hc = new HttpClient()
-    hc.PostAsJsonAsync s |> ignore
+    postAsync hc s |> ignore
 
     printfn "Download speed %f Mbps" speed
 
