@@ -34,7 +34,7 @@ type Speedtest = {
     Timestamp: int
 }
 
-let postAsync (client : HttpClient) (speed : Speedtest)=
+let postAsync (client : HttpClient) (speed : Speedtest) =
     let json = JsonConvert.SerializeObject(speed);
     let content = new StringContent (json)
     content.Headers.ContentType <- Headers.MediaTypeHeaderValue "application/json"
@@ -44,20 +44,22 @@ let postAsync (client : HttpClient) (speed : Speedtest)=
 // TODO, dette var gøy
 [<Measure>] type ms
 
+
+let time f =
+    let timer = Diagnostics.Stopwatch()
+    timer.Start()
+    let res = f ()
+    ((double timer.ElapsedMilliseconds) / 1000.0, res)
+
+
 [<EntryPoint>]
 let main argv =
     let hc = new HttpClient()
     
-    let timer = Diagnostics.Stopwatch()
-    timer.Start()
-
-    let noOfByte =
-        sites
-        |> downloadUrls hc
+    // TODO: Husk konverteringsfaktor som er feil. Hva blir enheten her.
+    let (t, noOfByte) = time (fun _ -> sites |> downloadUrls hc) 
     
-    let t = timer.ElapsedMilliseconds 
-    
-    let speed = (double noOfByte / double t) * 0.008
+    let speed = (double noOfByte / (double t * 8.0))
 
     let s = {
         Id = Guid.NewGuid()
