@@ -37,10 +37,9 @@ let main argv =
     speedtest time bytes conf.Sites
     |> postSpeedtest client conf.ApiUrl
     |> fun st ->
-        printfn "ID: %s, Date of measurement: %s, %s, Download speed: %f Mbps"
-            (st.Id.ToString())
-            (st.Timestamp.ToLocalTime().ToLongDateString())
-            (st.Timestamp.ToLocalTime().ToLongTimeString())
+        printfn "ID: %s, Timestamp: %s, Download speed: %f Mbps"
+            (string st.Id)
+            (string st.Timestamp)
             st.Download
 
     0

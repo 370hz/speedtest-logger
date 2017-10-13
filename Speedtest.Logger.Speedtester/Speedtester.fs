@@ -11,7 +11,7 @@ type Url = Url of string
 type Speedtest = {
     Id: Guid
     Download: float<Mbps>
-    Timestamp: DateTime
+    Timestamp: int64
 }
 
 let downloadUrls (bytes : Url -> byte[]) (urls : Url list) = 
@@ -28,5 +28,5 @@ let speedtest (time : (_ -> float<Mb>) -> float<sec> * float<Mb>) (bytes : Url -
     {
         Id = Guid.NewGuid()
         Download = mb / s
-        Timestamp = System.DateTime.Now.ToUniversalTime()
+        Timestamp = DateTimeOffset.Now.ToUnixTimeSeconds()
     }
