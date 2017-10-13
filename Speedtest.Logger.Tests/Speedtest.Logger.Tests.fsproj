@@ -14,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!--<ProjectReference Include="../Speedtest.Logger/Speedtest.Logger.fsproj" />-->
+    <ProjectReference Include="../Speedtest.Logger.Speedtester/Speedtest.Logger.Speedtester.fsproj" />
   </ItemGroup>
 
 </Project>
